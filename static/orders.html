@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    nav {
+        display: flex;
+        justify-content: end;
+        height: 100px;
+        background-color: cadetblue;
+    }
+
+    a {
+        margin: 50px;
+        color: #242222;
+        text-decoration: none;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .active {
+        color: white;
+    }
+
+    .container {
+        width: 70%;
+        display: flex;
+        justify-content: space-between;
+    }
+    h3 {
+        text-align: center;
+    }
+
+</style>
+<body>
+<header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/orders" class="active">Orders</a>
+        <a href="/admin">Admin</a>
+    </nav>
+</header>
+<main>
+    <h2>Orders for Restaurant</h2>
+    <div class="container">
+        <div>
+            <h3>getting ready</h3>
+            <ul id="1"></ul>
+
+        </div>
+        <div>
+            <h3>ready</h3>
+            <ul id="2">
+            </ul>
+        </div>
+    </div>
+
+
+</main>
+
+<script>
+    fetch('http://localhost:4000/api/orders')
+        .then(res => res.json())
+        .then(res => {
+            console.log(res)
+            const ul1 = document.getElementById('1')
+            const ul2 = document.getElementById('2')
+            res.orders.forEach((o) => {
+                const li = document.createElement('li')
+                li.innerText = o.title
+                if (o.isDone) {
+                    ul2.appendChild(li)
+                } else {
+                    ul1.appendChild(li)
+                }
+            })
+        })
+</script>
+</body>
+</html>

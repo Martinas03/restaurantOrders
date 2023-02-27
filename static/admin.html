@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    nav {
+        display: flex;
+        justify-content: end;
+        height: 100px;
+        background-color: cadetblue;
+    }
+
+    a {
+        margin: 50px;
+        color: #242222;
+        text-decoration: none;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .active {
+        color: white;
+    }
+
+    .container {
+        width: 70%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+</style>
+<body>
+<header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/orders">Orders</a>
+        <a href="/admin" class="active">Admin</a>
+    </nav>
+</header>
+<main>
+    <h2>Orders for Restaurant</h2>
+
+    <div class="container">
+        <div>
+            <h3>Orders</h3>
+            <ul>
+
+            </ul>
+        </div>
+
+        <div>
+            <h3>Create order</h3>
+            <input type="text">
+            <button>+</button>
+        </div>
+    </div>
+
+
+</main>
+<script>
+
+    const input = document.querySelector('input')
+    const btn = document.querySelector('button')
+
+    const changeStatus = (id) => {
+       const check = document.getElementById(id + 'input')
+        fetch('http://localhost:4000/api/orders/' + id, {
+            method: 'PUT',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify({
+                isDone: check.checked
+            })
+        })
+    }
+    const deleteOrder = (id) => {
+        console.log(id)
+        fetch('http://localhost:4000/api/orders/' + id, {
+            method: 'DELETE'
+        })
+            .then(()=>{
+                const li = document.getElementById(id)
+                li.remove()
+            })
+    }
+
+    btn.addEventListener('click', () =>{
+        fetch('http://localhost:4000/api/orders', {
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify({
+                title: input.value
+            })
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(input.value)
+                const ul = document.querySelector('ul')
+                const li = document.createElement('li')
+
+                li.id = res.id
+                li.innerHTML = `
+<span>${res.title}
+<span> ${res.isDone ? '<input  type="checkbox" checked >' :  '<input type="checkbox" onchange=changeStatus(${res.id}) >'}
+</span>
+</main>
+<button onclick=deleteOrder(${res.id})>X</button>
+</span>`
+                ul.appendChild(li)
+            })
+    })
+
+    fetch('http://localhost:4000/api/orders')
+        .then(res => res.json())
+        .then(res => {
+            console.log(res)
+            const ul1 = document.querySelector('ul')
+
+            res.orders.forEach((o) => {
+                const li = document.createElement('li')
+                li.id = o.id
+                li.innerHTML = `
+<span>${o.title}
+<span> ${`<input id='${o.id+'input'}' type="checkbox" onchange='changeStatus(${o.id})'"/>`}
+</span>
+</main>
+<button onclick=deleteOrder(${o.id})>X</button>
+</span>`
+                ul1.appendChild(li)
+                document.getElementById(o.id +'input').checked = o.isDone;
+            })
+        })
+</script>
+</body>
+</html>
